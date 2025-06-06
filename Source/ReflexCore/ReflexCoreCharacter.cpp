@@ -13,6 +13,9 @@
 #include "ReflexHUDWidget.h"
 #include "TargetDummy.h"
 #include "TextDisplayActor.h"
+#include "HitManager.h"
+#include "GameManager.h"
+#include "ReflexCoreGameMode.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -55,6 +58,9 @@ void AReflexCoreCharacter::BeginPlay()
 	}
 
 	FindTextDisplayActor();
+
+	HitManagerInstance = NewObject<UHitManager>();
+	HitManagerInstance->Init(scoreDisplayActor, accuracyDisplayActor);
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -104,41 +110,13 @@ void AReflexCoreCharacter::Fire()
 	FCollisionQueryParams params;
 	params.AddIgnoredActor(this);
 
-	bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startLocation, endLocation, ECC_WorldDynamic, params);
+	bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startLocation, endLocation, ECC_Visibility, params);
 
-	if(bHit)
-	{
-		FTransform bulletTrans;
-		bulletTrans.SetLocation(hitInfo.ImpactPoint);
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), impactBulletEffect, bulletTrans);
-		
-		if (FireSound != nullptr) UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	bIsHitTarget = false;
 
-		if (FireAnimation != nullptr)
-		{
-			UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
-			if (AnimInstance != nullptr)
-			{
-				AnimInstance->Montage_Play(FireAnimation, 1.f);
-			}
-		}
-
-		hitCount++;
-
-		auto* target = hitInfo.GetActor();
-		if(!target) return;
-
-		auto* targetActor = Cast<ATargetDummy>(target);
-		if(targetActor) 
-		{
-			curScore++;
-			targetActor->TargetDestroy();
-			scoreDisplayActor->UpdateDisplayValue(curScore);
-		}
-
-		const float curAccuracy = hitCount > 0 ? (curScore/hitCount) * 100 : 0;
-		accuracyDisplayActor->UpdateDisplayValue(curAccuracy);		
-	}
+	FireMotion(bHit, hitInfo);
+	HitTargetActor(bHit, hitInfo);
+	HitTextActor(bHit, hitInfo);
 }
 
 void AReflexCoreCharacter::FindTextDisplayActor()
@@ -156,6 +134,87 @@ void AReflexCoreCharacter::FindTextDisplayActor()
 		else if (TextActor && TextActor->GetDisplayCategory() == ETextDisplayCategory::accuracyRate)
 		{
 			accuracyDisplayActor = TextActor;
+		}
+	}
+}
+
+void AReflexCoreCharacter::FireMotion(bool bHit, FHitResult hitInfo)
+{	
+	if(!bHit) return;
+
+	FTransform bulletTrans;
+	bulletTrans.SetLocation(hitInfo.ImpactPoint);
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), impactBulletEffect, bulletTrans);
+
+	if (FireSound != nullptr)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+
+	if (FireAnimation != nullptr)
+	{
+		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+		if (AnimInstance != nullptr)
+		{
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
+	}
+}
+
+void AReflexCoreCharacter::HitTargetActor(bool bHit, FHitResult hitInfo)
+{
+	if(!bHit) return;
+
+	auto* target = hitInfo.GetActor();
+	if(!target) return;
+
+	auto* targetActor = Cast<ATargetDummy>(target);
+	if(targetActor) 
+	{
+		bIsHitTarget = true;
+		targetActor->TargetDestroy();
+	}
+
+	HitManagerInstance->ProcessHit(bIsHitTarget);
+}
+
+void AReflexCoreCharacter::HitTextActor(bool bHit, FHitResult hitInfo)
+{
+	if(!bHit) return;
+	UE_LOG(LogTemp, Warning, TEXT("Called HitTextActor"));
+
+	UPrimitiveComponent* hitComp = hitInfo.GetComponent();
+	if(!hitComp) return;
+
+	AActor* ownerActor = hitComp->GetOwner();
+	if(!ownerActor) return;
+
+	if(ATextDisplayActor* TextActor = Cast<ATextDisplayActor>(ownerActor))
+	{
+		auto* gameMode = Cast<AReflexCoreGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		if(gameMode)
+		{
+			switch(TextActor->GetDisplayCategory())
+			{
+				case ETextDisplayCategory::difficulty :
+				break;
+
+				case ETextDisplayCategory::startMode :
+					gameMode->GetGameManager()->StartGame();
+				break;
+
+				case ETextDisplayCategory::endMode :
+					gameMode->GetGameManager()->EndGame();
+				break;
+
+				case ETextDisplayCategory::restartMode :
+					gameMode->GetGameManager()->RestartGame();
+				break;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Cast Failed gameManager"));
 		}
 	}
 }

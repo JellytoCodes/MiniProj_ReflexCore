@@ -11,8 +11,23 @@ class AReflexCoreGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
-public:
+public :
 	AReflexCoreGameMode();
+
+	virtual void BeginPlay() override;
+
+private :
+	UPROPERTY(VisibleAnywhere, Category = "GameManager", meta = (AllowPrivateAccess = "true"))
+	class ATextDisplayActor* timerDisplayActor;
+	
+	UPROPERTY(VisibleAnywhere, Category = "GameManager", meta = (AllowPrivateAccess = "true"))
+	class ATextDisplayActor* difficultyDisplayActor;
+
+	class AGameManager* gameManager;
+
+public :
+	FORCEINLINE AGameManager* GetGameManager() { return gameManager; }
+	
 };
 
 

@@ -72,15 +72,20 @@ private :
 
 	class UReflexHUDWidget* reflexHUDWidgetInstance;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (AllowPrivateAccess = "true"))
+	class UHitManager* HitManagerInstance;
+
+	UPROPERTY(VisibleAnywhere, Category = "HitManager", meta = (AllowPrivateAccess = "true"))
 	class ATextDisplayActor* scoreDisplayActor;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "HitManager", meta = (AllowPrivateAccess = "true"))
 	class ATextDisplayActor* accuracyDisplayActor;
+
+	bool bIsHitTarget = false;
 
 	void FindTextDisplayActor();
 
-	float curScore = 0;
-	float hitCount = 0;
+	void FireMotion(bool bHit, FHitResult hitInfo);
+	void HitTargetActor(bool bHit, FHitResult hitInfo);
+	void HitTextActor(bool bHit, FHitResult hitInfo);
 };
 

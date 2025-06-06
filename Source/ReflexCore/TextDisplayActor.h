@@ -9,9 +9,14 @@
 UENUM(BlueprintType)
 enum class ETextDisplayCategory : uint8
 {
+	none,
 	score,
 	timer,
 	accuracyRate,
+	difficulty,
+	startMode,
+	endMode,
+	restartMode,
 };
 
 UCLASS()
@@ -23,6 +28,7 @@ public :
 	ATextDisplayActor();
 
 	void UpdateDisplayValue(float value);
+	void UpdateDisplayValue();
 
 	ETextDisplayCategory GetDisplayCategory() { return displayCategory; }
 
@@ -31,8 +37,11 @@ protected :
 
 private :
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text", meta = (AllowPrivateAccess = "true"))
-	ETextDisplayCategory displayCategory;
+	ETextDisplayCategory displayCategory = ETextDisplayCategory::none;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text", meta = (AllowPrivateAccess = "true"))
 	class UTextRenderComponent* textRender;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Text", meta = (AllowPrivateAccess = "true"))
+	class UBoxComponent* collisionComp;
 };
