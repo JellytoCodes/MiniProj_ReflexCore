@@ -12,7 +12,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp; → difficultyDisplayActor가 nullptr인 상태에서 TextActor에 FString을 적용하는 과정에서 크래시 발생  
 
 &nbsp;**🛠️ 해결 방안**  
-&nbsp;&nbsp;&nbsp;&nbsp; → difficultyDisplayActor->UpdateDisplayValue((float)curDifficulty); 함수 호출 시점을 if(difficultyDisplayActor) nullptr 체크 후 함수 호출 될 수 있도록 변경  
+&nbsp;&nbsp;&nbsp;&nbsp; → difficultyDisplayActor->UpdateDisplayValue((float)curDifficulty); 함수 호출 시점을  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(difficultyDisplayActor) nullptr 체크 후 함수 호출 될 수 있도록 변경  
 
 &nbsp;**📈 개선 방안**  
 &nbsp;&nbsp;&nbsp;&nbsp; → GameModeBase에서 InitGame or BeginPlay 시 월드에 필요한 액터들이 완전히 스폰되었는지 체크 후 초기화 실행  
