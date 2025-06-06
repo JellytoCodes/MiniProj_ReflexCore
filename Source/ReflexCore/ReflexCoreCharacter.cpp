@@ -11,6 +11,8 @@
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
 #include "ReflexHUDWidget.h"
+#include "TargetDummy.h"
+#include "TextDisplayActor.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -51,6 +53,8 @@ void AReflexCoreCharacter::BeginPlay()
 		reflexHUDWidgetInstance = CreateWidget<UReflexHUDWidget>(GetWorld(), reflexHUDWidgetClass);
 		reflexHUDWidgetInstance->AddToViewport();
 	}
+
+	FindTextDisplayActor();
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -108,20 +112,50 @@ void AReflexCoreCharacter::Fire()
 		bulletTrans.SetLocation(hitInfo.ImpactPoint);
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), impactBulletEffect, bulletTrans);
 		
-		if (FireSound != nullptr)
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
-		}
-	
-		// Try and play a firing animation if specified
+		if (FireSound != nullptr) UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+
 		if (FireAnimation != nullptr)
 		{
-			// Get the animation object for the arms mesh
 			UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
 			if (AnimInstance != nullptr)
 			{
 				AnimInstance->Montage_Play(FireAnimation, 1.f);
 			}
+		}
+
+		hitCount++;
+
+		auto* target = hitInfo.GetActor();
+		if(!target) return;
+
+		auto* targetActor = Cast<ATargetDummy>(target);
+		if(targetActor) 
+		{
+			curScore++;
+			targetActor->TargetDestroy();
+			scoreDisplayActor->UpdateDisplayValue(curScore);
+		}
+
+		const float curAccuracy = hitCount > 0 ? (curScore/hitCount) * 100 : 0;
+		accuracyDisplayActor->UpdateDisplayValue(curAccuracy);		
+	}
+}
+
+void AReflexCoreCharacter::FindTextDisplayActor()
+{
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATextDisplayActor::StaticClass(), FoundActors);
+
+	for (AActor* Actor : FoundActors)
+	{
+		ATextDisplayActor* TextActor = Cast<ATextDisplayActor>(Actor);
+		if (TextActor && TextActor->GetDisplayCategory() == ETextDisplayCategory::score)
+		{
+			scoreDisplayActor = TextActor;
+		}
+		else if (TextActor && TextActor->GetDisplayCategory() == ETextDisplayCategory::accuracyRate)
+		{
+			accuracyDisplayActor = TextActor;
 		}
 	}
 }

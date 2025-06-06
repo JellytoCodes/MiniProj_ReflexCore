@@ -20,8 +20,6 @@ UCLASS(config=Game)
 class AReflexCoreCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
-
 	
 public:
 	AReflexCoreCharacter();
@@ -69,9 +67,20 @@ private :
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* FireAnimation;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (AllowPrivateAccess = "true"));
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class UReflexHUDWidget> reflexHUDWidgetClass;
 
 	class UReflexHUDWidget* reflexHUDWidgetInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (AllowPrivateAccess = "true"))
+	class ATextDisplayActor* scoreDisplayActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (AllowPrivateAccess = "true"))
+	class ATextDisplayActor* accuracyDisplayActor;
+
+	void FindTextDisplayActor();
+
+	float curScore = 0;
+	float hitCount = 0;
 };
 

@@ -2,26 +2,29 @@
 
 
 #include "TargetDummy.h"
+#include "Components/StaticMeshComponent.h"
+#include "Components/SphereComponent.h"
 
-// Sets default values
 ATargetDummy::ATargetDummy()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
+	targetMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Target"));
+	RootComponent = targetMesh;
 }
 
-// Called when the game starts or when spawned
 void ATargetDummy::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	GetWorldTimerManager().SetTimer(lifeTimer, this, &ATargetDummy::TargetDestroy, lifeSpan, false);
 }
 
-// Called every frame
-void ATargetDummy::Tick(float DeltaTime)
+void ATargetDummy::TargetDestroy()
 {
-	Super::Tick(DeltaTime);
-
+	GetWorldTimerManager().ClearTimer(lifeTimer);
+	Destroy();
 }
+
+
 

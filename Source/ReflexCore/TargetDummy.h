@@ -12,15 +12,19 @@ class REFLEXCORE_API ATargetDummy : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ATargetDummy();
 
+	void TargetDestroy();
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+private :
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target", meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* targetMesh;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target", meta = (AllowPrivateAccess = "true"))
+	float lifeSpan = 1.5f;
+
+	FTimerHandle lifeTimer;
 };
