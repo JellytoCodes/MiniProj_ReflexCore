@@ -56,9 +56,6 @@ private :
 	void Fire();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
-	class UParticleSystem* impactBulletEffect;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
 	USoundBase* FireSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, meta = (AllowPrivateAccess = "true"))
@@ -72,13 +69,15 @@ private :
 
 	class UReflexHUDWidget* reflexHUDWidgetInstance;
 
-	class UHitManager* HitManagerInstance;
+	class UHitManager* hitManagerInstance;
 
 	UPROPERTY(VisibleAnywhere, Category = "HitManager", meta = (AllowPrivateAccess = "true"))
 	class ATextDisplayActor* scoreDisplayActor;
 
 	UPROPERTY(VisibleAnywhere, Category = "HitManager", meta = (AllowPrivateAccess = "true"))
 	class ATextDisplayActor* accuracyDisplayActor;
+
+	class AReflexCoreGameMode* gameMode;
 
 	bool bIsHitTarget = false;
 

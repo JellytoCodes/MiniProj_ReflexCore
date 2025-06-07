@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "GameManager.generated.h"
 
+//추후 난이도 조정 기능 추가
 UENUM(BlueprintType)
 enum class EGameDifficulty : uint8
 {
@@ -17,6 +18,10 @@ enum class EGameDifficulty : uint8
 //클래스 전방 선언
 class ATextDisplayActor;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartOnBroadCast);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FRestartOnBroadCast);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndOnBroadCast);
+
 UCLASS()
 class REFLEXCORE_API AGameManager : public AActor
 {
@@ -25,23 +30,20 @@ class REFLEXCORE_API AGameManager : public AActor
 public:	
 	AGameManager();
 
-	virtual void BeginPlay() override;
-
 	void StartGame();
 	void EndGame();
 	void RestartGame();
 
 	bool IsGameActive() const { return bGameActive; }
 
-	void SetDifficulty(EGameDifficulty newDifficulty);
-	EGameDifficulty GetDifficulty() const { return curDifficulty; }
-
 	void InitTextActors(ATextDisplayActor* inTimerActor, ATextDisplayActor* inDifficultyActor);
+
+	FStartOnBroadCast startOnBroadCast;
+	FRestartOnBroadCast restartOnBroadCast;
+	FEndOnBroadCast endOnBroadCast;
 
 private :
 	bool bGameActive = false;
-
-	EGameDifficulty curDifficulty = EGameDifficulty::Normal;
 
 	UPROPERTY(EditAnywhere, Category = "GameManager", meta = (AllowPrivateAccess = "true"))
 	float gameDuration = 30.f;
@@ -56,5 +58,4 @@ private :
 	ATextDisplayActor* difficultyDisplayActor;
 
 	void UpdateGameTimer();
-	void UpdateTextDisplays();
 };

@@ -32,6 +32,11 @@ void UHitManager::ResetStats()
     UpdateTextDisplays();
 }
 
+void UHitManager::HitTextDisplay()
+{
+    totalShots--;
+}
+
 float UHitManager::GetAccuracyRate() const
 {
     return (totalShots > 0) ? (static_cast<float>(hitCount) / totalShots) * 100.f : 0.f;

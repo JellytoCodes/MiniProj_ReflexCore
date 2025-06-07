@@ -27,8 +27,17 @@ private :
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Spawner", meta = (AllowPrivateAccess = "true"))
 	float spawnedDelay = 1.5f;
 
-	int32 maxXPos = 10;
+	int32 maxXPos = 6;
 	int32 maxZPos = 6;
+	int32 maxSpawn = 7;
+	FTimerHandle spawnTimer;
 
 	void SpawnedTarget();
+	void GetSpawnedLocation();
+
+	UFUNCTION()
+	void SpawnedStart();
+
+	UFUNCTION()
+	void SpawnedStop();
 };

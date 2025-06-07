@@ -11,17 +11,6 @@ AGameManager::AGameManager()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
-void AGameManager::BeginPlay()
-{
-	Super::BeginPlay();
-	
-	FTimerHandle loadTimer;
-	GetWorldTimerManager().SetTimer(loadTimer, [&]
-	{
-		UpdateTextDisplays();
-	}, .1f, false);
-}
-
 void AGameManager::StartGame()
 {
 	if(bGameActive) return;
@@ -29,17 +18,18 @@ void AGameManager::StartGame()
 	bGameActive = true;
 	elapsedTime = 0.f;
 
-	GetWorldTimerManager().SetTimer(gameTimer, this, &AGameManager::UpdateGameTimer, 1.f, true);
+	startOnBroadCast.Broadcast();
 
-	UE_LOG(LogTemp, Warning, TEXT("Game Started"));
+	GetWorldTimerManager().SetTimer(gameTimer, this, &AGameManager::UpdateGameTimer, 1.f, true);
 }
 
 void AGameManager::EndGame()
 {
 	bGameActive = false;
-	GetWorldTimerManager().ClearTimer(gameTimer);
 
-	UE_LOG(LogTemp, Warning, TEXT("Game Ended"));
+	endOnBroadCast.Broadcast();
+
+	GetWorldTimerManager().ClearTimer(gameTimer);
 }
 
 void AGameManager::RestartGame()
@@ -48,17 +38,10 @@ void AGameManager::RestartGame()
 	StartGame();
 }
 
-void AGameManager::SetDifficulty(EGameDifficulty newDifficulty)
-{
-	curDifficulty = newDifficulty;
-	UpdateTextDisplays();
-}
-
 void AGameManager::InitTextActors(ATextDisplayActor *inTimerActor, ATextDisplayActor *inDifficultyActor)
 {
 	timerDisplayActor = inTimerActor;
 	difficultyDisplayActor = inDifficultyActor;
-	UpdateTextDisplays();
 }
 
 void AGameManager::UpdateGameTimer()
@@ -74,28 +57,5 @@ void AGameManager::UpdateGameTimer()
 	}
 
 	if(remainTime <= 0.f) EndGame();
-}
-
-void AGameManager::UpdateTextDisplays()
-{
-	if(difficultyDisplayActor)
-	{
-		FString diffName;
-
-		switch(curDifficulty)
-		{
-			case EGameDifficulty::Easy :
-				diffName = "Easy";
-			break;
-			case EGameDifficulty::Normal :
-				diffName = "Normal";
-			break;
-
-			case EGameDifficulty::Hard :
-				diffName = "Hard";
-			break;
-		}
-		difficultyDisplayActor->UpdateDisplayValue((float)curDifficulty);
-	}
 }
 

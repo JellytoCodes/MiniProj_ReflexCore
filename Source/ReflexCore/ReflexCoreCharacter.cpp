@@ -59,8 +59,10 @@ void AReflexCoreCharacter::BeginPlay()
 
 	FindTextDisplayActor();
 
-	HitManagerInstance = NewObject<UHitManager>();
-	HitManagerInstance->Init(scoreDisplayActor, accuracyDisplayActor);
+	hitManagerInstance = NewObject<UHitManager>();
+	hitManagerInstance->Init(scoreDisplayActor, accuracyDisplayActor);
+
+	gameMode = Cast<AReflexCoreGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -113,10 +115,12 @@ void AReflexCoreCharacter::Fire()
 	bool bHit = GetWorld()->LineTraceSingleByChannel(hitInfo, startLocation, endLocation, ECC_Visibility, params);
 
 	bIsHitTarget = false;
-
 	FireMotion(bHit, hitInfo);
+	
 	HitTargetActor(bHit, hitInfo);
 	HitTextActor(bHit, hitInfo);
+
+	if(gameMode->GetGameManager()->IsGameActive()) hitManagerInstance->ProcessHit(bIsHitTarget);
 }
 
 void AReflexCoreCharacter::FindTextDisplayActor()
@@ -141,10 +145,6 @@ void AReflexCoreCharacter::FindTextDisplayActor()
 void AReflexCoreCharacter::FireMotion(bool bHit, FHitResult hitInfo)
 {	
 	if(!bHit) return;
-
-	FTransform bulletTrans;
-	bulletTrans.SetLocation(hitInfo.ImpactPoint);
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), impactBulletEffect, bulletTrans);
 
 	if (FireSound != nullptr)
 	{
@@ -174,14 +174,11 @@ void AReflexCoreCharacter::HitTargetActor(bool bHit, FHitResult hitInfo)
 		bIsHitTarget = true;
 		targetActor->TargetDestroy();
 	}
-
-	HitManagerInstance->ProcessHit(bIsHitTarget);
 }
 
 void AReflexCoreCharacter::HitTextActor(bool bHit, FHitResult hitInfo)
 {
-	if(!bHit) return;
-	UE_LOG(LogTemp, Warning, TEXT("Called HitTextActor"));
+	if(!bHit && bIsHitTarget) return;
 
 	UPrimitiveComponent* hitComp = hitInfo.GetComponent();
 	if(!hitComp) return;
@@ -191,7 +188,7 @@ void AReflexCoreCharacter::HitTextActor(bool bHit, FHitResult hitInfo)
 
 	if(ATextDisplayActor* TextActor = Cast<ATextDisplayActor>(ownerActor))
 	{
-		auto* gameMode = Cast<AReflexCoreGameMode>(UGameplayStatics::GetGameMode(GetWorld()));
+		
 		if(gameMode)
 		{
 			switch(TextActor->GetDisplayCategory())
@@ -201,20 +198,19 @@ void AReflexCoreCharacter::HitTextActor(bool bHit, FHitResult hitInfo)
 
 				case ETextDisplayCategory::startMode :
 					gameMode->GetGameManager()->StartGame();
+					hitManagerInstance->HitTextDisplay();
 				break;
 
 				case ETextDisplayCategory::endMode :
 					gameMode->GetGameManager()->EndGame();
+					hitManagerInstance->HitTextDisplay();
 				break;
 
 				case ETextDisplayCategory::restartMode :
 					gameMode->GetGameManager()->RestartGame();
+					hitManagerInstance->ResetStats();
 				break;
 			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Cast Failed gameManager"));
 		}
 	}
 }

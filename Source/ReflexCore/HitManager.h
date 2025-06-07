@@ -15,13 +15,10 @@ class REFLEXCORE_API UHitManager : public UObject
 
 public :
 	void Init(ATextDisplayActor* inScoreActor, ATextDisplayActor* inAccuracyActor);
-
 	void ProcessHit(bool bDidHit);
-
 	void ResetStats();
-
+	void HitTextDisplay();
 	float GetAccuracyRate() const;
-
 	int32 GetScore() const { return score; }
 
 private :

@@ -13,9 +13,9 @@ AReflexCoreGameMode::AReflexCoreGameMode() : Super()
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 }
 
-void AReflexCoreGameMode::BeginPlay()
+void AReflexCoreGameMode::InitGame(const FString & MapName, const FString & Options, FString & ErrorMessage)
 {
-	Super::BeginPlay();
+	Super::InitGame(MapName, Options, ErrorMessage);
 
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATextDisplayActor::StaticClass(), FoundActors);
@@ -35,5 +35,4 @@ void AReflexCoreGameMode::BeginPlay()
 
 	gameManager = Cast<AGameManager>(UGameplayStatics::GetActorOfClass(GetWorld(), AGameManager::StaticClass()));
 	if(gameManager) gameManager->InitTextActors(timerDisplayActor, difficultyDisplayActor);
-	else UE_LOG(LogTemp, Warning, TEXT("Failed Log"));
 }

@@ -24,7 +24,7 @@ private :
 	UStaticMeshComponent* targetMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Target", meta = (AllowPrivateAccess = "true"))
-	float lifeSpan = 1.5f;
+	float lifeSpan = 1.25f;
 
 	FTimerHandle lifeTimer;
 };
