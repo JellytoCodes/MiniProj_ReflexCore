@@ -19,9 +19,6 @@
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
-//////////////////////////////////////////////////////////////////////////
-// AReflexCoreCharacter
-
 AReflexCoreCharacter::AReflexCoreCharacter()
 {
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
@@ -188,7 +185,6 @@ void AReflexCoreCharacter::HitTextActor(bool bHit, FHitResult hitInfo)
 
 	if(ATextDisplayActor* TextActor = Cast<ATextDisplayActor>(ownerActor))
 	{
-		
 		if(gameMode)
 		{
 			switch(TextActor->GetDisplayCategory())
