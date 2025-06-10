@@ -33,6 +33,7 @@ public:
 	void StartGame();
 	void EndGame();
 	void RestartGame();
+	void QuitGame();
 
 	bool IsGameActive() const { return bGameActive; }
 

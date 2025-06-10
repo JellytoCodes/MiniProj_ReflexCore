@@ -33,6 +33,7 @@ void ATextDisplayActor::BeginPlay()
 	else if(displayCategory == ETextDisplayCategory::startMode) UpdateDisplayValue();
 	else if(displayCategory == ETextDisplayCategory::endMode) UpdateDisplayValue();
 	else if(displayCategory == ETextDisplayCategory::restartMode) UpdateDisplayValue();
+	else if(displayCategory == ETextDisplayCategory::quitMode) UpdateDisplayValue();
 	else return;
 }
 
@@ -68,6 +69,10 @@ void ATextDisplayActor::UpdateDisplayValue()
 
 		case ETextDisplayCategory::restartMode :
 			textRender->SetText(FText::FromString(FString::Printf(TEXT("Restart"))));
+		break;
+
+		case ETextDisplayCategory::quitMode :
+			textRender->SetText(FText::FromString(FString::Printf(TEXT("Quit"))));
 		break;
 	}
 }

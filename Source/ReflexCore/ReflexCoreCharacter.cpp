@@ -195,6 +195,7 @@ void AReflexCoreCharacter::HitTextActor(bool bHit, FHitResult hitInfo)
 				case ETextDisplayCategory::startMode :
 					gameMode->GetGameManager()->StartGame();
 					hitManagerInstance->HitTextDisplay();
+					hitManagerInstance->ResetStats();
 				break;
 
 				case ETextDisplayCategory::endMode :
@@ -206,6 +207,10 @@ void AReflexCoreCharacter::HitTextActor(bool bHit, FHitResult hitInfo)
 					gameMode->GetGameManager()->RestartGame();
 					hitManagerInstance->ResetStats();
 				break;
+
+				case ETextDisplayCategory::quitMode :
+					gameMode->GetGameManager()->QuitGame();
+				break; 
 			}
 		}
 	}

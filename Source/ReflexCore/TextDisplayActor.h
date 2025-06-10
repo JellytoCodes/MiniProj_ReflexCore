@@ -17,6 +17,7 @@ enum class ETextDisplayCategory : uint8
 	startMode,
 	endMode,
 	restartMode,
+	quitMode,
 };
 
 UCLASS()

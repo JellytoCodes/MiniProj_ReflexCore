@@ -3,6 +3,7 @@
 
 #include "GameManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "kismet/KismetSystemLibrary.h"
 #include "TimerManager.h"
 #include "TextDisplayActor.h"
 
@@ -36,6 +37,11 @@ void AGameManager::RestartGame()
 {
 	EndGame();
 	StartGame();
+}
+
+void AGameManager::QuitGame()
+{
+	UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, false);
 }
 
 void AGameManager::InitTextActors(ATextDisplayActor *inTimerActor, ATextDisplayActor *inDifficultyActor)
